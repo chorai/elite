@@ -27,7 +27,7 @@ function Ball:init()
 --    self:setScale(1)
     local size = self:getContentSize()
     self.size = size.width/2
-    local pBall = cc.PhysicsBody:createCircle(size.width/2, cc.PhysicsMaterial(1.0, 0.6, 0.3))
+    local pBall = cc.PhysicsBody:createCircle(size.width/2, cc.PhysicsMaterial(1, 0, 0.3))
     pBall:setDynamic(true)
     pBall:setRotationEnable(true)
     pBall:setMoment(PHYSICS_INFINITY)
