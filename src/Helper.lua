@@ -1,9 +1,9 @@
 
 -- size
-FRAME_SIZE = cc.Director:getInstance():getOpenGLView():getFrameSize()
-ORIGIN = cc.Director:getInstance():getVisibleOrigin()
-VISIBLE_SIZE = cc.Director:getInstance():getVisibleSize()
-WIN_SIZE = cc.Director:getInstance():getWinSize()
+--FRAME_SIZE = cc.Director:getInstance():getOpenGLView():getFrameSize()
+--ORIGIN = cc.Director:getInstance():getVisibleOrigin()
+--VISIBLE_SIZE = cc.Director:getInstance():getVisibleSize()
+--WIN_SIZE = cc.Director:getInstance():getWinSize()
 
 PLANE_BULLET_TYPE               = 0
 ENEMY_BULLET_TYPE               = 1

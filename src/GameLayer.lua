@@ -20,11 +20,10 @@ GameLayer.playerRight = nil             -- PlayerRight (相手)
 GameLayer.footer = nil
 GameLayer.name = nil
 
-local winSize = cc.Director:getInstance():getWinSize()
-local offside = winSize.height/2 + 25
+local winSize = nil
+local offside = nil
 
-
-local MAX_BULLET = 42
+local MAX_BULLET = 41
 local _bullet = 0
 local _time = 0
 local _tag = nil
@@ -53,6 +52,9 @@ local Tag = {
 
 function GameLayer:ctor()
     self.name = self.class.__cname
+    _bullet = 0
+    winSize = cc.Director:getInstance():getWinSize()
+    offside = winSize.height/2 + 25
 end
 
 
@@ -64,14 +66,13 @@ end
 
 
 function GameLayer:init()
-    self:loadingMusic() -- 背景音乐
+--    self:loadingMusic() -- 背景音乐
     --    self:addBG()        -- 初始化背景
     --    self:moveBG()       -- 背景移动
-    self:addBtn()       -- 游戏暂停按钮
+--    self:addBtn()       -- 游戏暂停按钮
     --    self:addFooter()
-    self:addSchedule()  -- 更新
-    self:addTouch()     -- 触摸
-    self:addContact()   -- 碰撞检测
+    
+--    self:addContact()   -- 碰撞检测
 
     Global:getInstance():resetGame()    -- 初始化全局变量
     self:initGameState()                -- 初始化游戏数据状态
@@ -79,7 +80,10 @@ function GameLayer:init()
     --    self:initSpritePlayerRight()        -- 初期化（相手）
     --    self:addATKSprite()
     self:addPuzzle()
-
+    
+    self:addSchedule()  -- 更新
+    self:addTouch()     -- 触摸
+    
     _bulletVicts = {}
     _fingerPosition = nil
 end
@@ -97,7 +101,7 @@ function GameLayer:addPuzzle()
         }
     local wall = cc.Node:create()
     --    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
-    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0.0,0.0,0.5))
+    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0,0,0.5))
     wall:setPhysicsBody(edge)
     --    wall:setPosition(0,0)
     wall:setPosition(VisibleRect:center())
@@ -343,7 +347,7 @@ end
 
 function GameLayer:update(dt)
     _time = _time + 1
-    if MAX_BULLET > _bullet then
+    if MAX_BULLET >= _bullet then
         self:showBullet()
     end
 
