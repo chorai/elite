@@ -272,7 +272,7 @@ function GameLayer:addTouch()
             elseif isTableContains(_bullets,bullet) == false then
                 local p1 = _bullets[#_bullets]:getPosition()
                 local p2 = bullet:getPosition()
-                local distance = math.abs(p1-p2)
+                local distance = cc.pGetDistance(p1,p2)
                 print("####### distance"..distance)
                 print("####### bullet.size"..bullet.size)
                 if distance < bullet.size * 3 then
@@ -361,7 +361,11 @@ function GameLayer:update(dt)
     end
 
     self:DrawLineRemove()
-
+    
+    if next(_bulletVicts) ~= nil then
+        print("############## CAONIMA")
+    end
+    
     local node = DrawLine:create(_bulletVicts)
     self:addChild(node,ZOrder.Z_Line,Tag.T_Line)
     _bulletVicts = {}

@@ -18,9 +18,9 @@ function DrawLine:init(vecs)
     if vecs ~= nil then
         for key, var in ipairs(vecs) do
             if temVec ~=nil then
-                self:drawSegment(cc.p(temVec.x,temVec.y),cc.p(var.x,var.y),3,cc.c4f(255,255,255,255))
-                temVec = var
+                self:drawSegment(cc.p(temVec.x,temVec.y),cc.p(var.x,var.y),3,cc.c4f(1.0, 1.0, 1.0, 1.0))
             end
+            temVec = var
         end
     end
 

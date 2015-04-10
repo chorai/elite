@@ -20,11 +20,11 @@ function Ball:create()
 end
 
 function Ball:init()
---    local texture = cc.Director:getInstance():getTextureCache():addImage("status_hp.png")
---    local spriteFrame = cc.SpriteFrame:createWithTexture(texture, cc.rect(0, 0, self.size, self.size))
---    self:createWithSpriteFrame(spriteFrame)
-    
---    self:setScale(1)
+    --    local texture = cc.Director:getInstance():getTextureCache():addImage("status_hp.png")
+    --    local spriteFrame = cc.SpriteFrame:createWithTexture(texture, cc.rect(0, 0, self.size, self.size))
+    --    self:createWithSpriteFrame(spriteFrame)
+
+    --    self:setScale(1)
     local size = self:getContentSize()
     self.size = size.width/2
     local pBall = cc.PhysicsBody:createCircle(size.width/2, cc.PhysicsMaterial(1, 0, 0.3))
@@ -41,6 +41,13 @@ function Ball:brokenBullet()
     local remove = cc.RemoveSelf:create()
     self:runAction(remove)
     self._state = self.BROKEN
+end
+
+function Ball:getPosition()
+    local pos = {}
+    pos.x = self:getPositionX()
+    pos.y = self:getPositionY()
+    return pos
 end
 
 function Ball:getState()
