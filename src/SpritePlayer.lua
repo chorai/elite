@@ -76,7 +76,7 @@ function SpritePlayer:init()
     local sp0 = cc.SpriteFrame:createWithTexture(texture, cc.rect(0, 0, 50, 50))
     self:setSpriteFrame(sp0)
     self.size = self:getContentSize()
-    self:setPosition(cc.p(30, 0))
+    self:setPosition(cc.p(50, WIN_SIZE.height/2 + 120))
 
     -- hp value
     self.label_hp = cc.Label:createWithBMFont("Font/arial-14.fnt", self.hp)
@@ -95,10 +95,10 @@ function SpritePlayer:init()
     --    self.action:setCascadeOpacityEnabled(false)
     hp:setCascadeOpacityEnabled(false)
 
-    self:setPhysicsBody(cc.PhysicsBody:createCircle(self:getContentSize().width/2))
-    self:getPhysicsBody():setCategoryBitmask(CATEGORY_MASK_PLAYER_A)
-    self:getPhysicsBody():setCollisionBitmask(COLLISION_MASK_PLAYER_A)
-    self:getPhysicsBody():setContactTestBitmask(CONTACTTEST_MASK_PLAYER_A)
+--    self:setPhysicsBody(cc.PhysicsBody:createCircle(self:getContentSize().width/2))
+--    self:getPhysicsBody():setCategoryBitmask(CATEGORY_MASK_PLAYER_A)
+--    self:getPhysicsBody():setCollisionBitmask(COLLISION_MASK_PLAYER_A)
+--    self:getPhysicsBody():setContactTestBitmask(CONTACTTEST_MASK_PLAYER_A)
 end
 --------------------------------------------------------------------------------
 -- attack

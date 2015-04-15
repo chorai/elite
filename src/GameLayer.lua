@@ -23,7 +23,7 @@ GameLayer.name = nil
 local winSize = nil
 local offside = nil
 
-local MAX_BULLET = 41
+local MAX_BULLET = 50
 local _bullet = 0
 local _time = 0
 local _tag = nil
@@ -67,18 +67,18 @@ end
 
 function GameLayer:init()
 --    self:loadingMusic() -- 背景音乐
-    --    self:addBG()        -- 初始化背景
+    self:addBG()        -- 初始化背景
     --    self:moveBG()       -- 背景移动
 --    self:addBtn()       -- 游戏暂停按钮
-    --    self:addFooter()
+--    self:addFooter()
     
 --    self:addContact()   -- 碰撞检测
 
     Global:getInstance():resetGame()    -- 初始化全局变量
     self:initGameState()                -- 初始化游戏数据状态
-    --    self:initSpritePlayer()             -- 初期化（自分）
-    --    self:initSpritePlayerRight()        -- 初期化（相手）
-    --    self:addATKSprite()
+    self:initSpritePlayer()             -- 初期化（自分）
+    self:initSpritePlayerRight()        -- 初期化（相手）
+--    self:addATKSprite()
     self:addPuzzle()
     
     self:addSchedule()  -- 更新
@@ -100,8 +100,8 @@ function GameLayer:addPuzzle()
             cc.p(winSize.width-1, winSize.height-1),
         }
     local wall = cc.Node:create()
-    --    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
-    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0,0,0.5))
+--    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
+    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0,0,0.5),10)
     wall:setPhysicsBody(edge)
     --    wall:setPosition(0,0)
     wall:setPosition(VisibleRect:center())
@@ -110,22 +110,26 @@ function GameLayer:addPuzzle()
 end
 
 function GameLayer:showBullet()
-    local _tagColor = {
-        [1] = cc.c3b(0,255,255),
-        [2] = cc.c3b(0,0,255),
-        [3] = cc.c3b(128,128,128),
-        [4] = cc.c3b(255,0,0),
-        [5] = cc.c3b(255,255,255),
-    }
-    local ball = Ball:create()
-    local tagNum = math.random(1,5)
-    ball:setColor(_tagColor[tagNum])
+--    local _tagColor = {
+--        [1] = cc.c3b(102,255,51),
+--        [2] = cc.c3b(255,153,255),
+--        [3] = cc.c3b(204,0,0),
+--        [4] = cc.c3b(51,51,204),
+--        [5] = cc.c3b(255,255,255),
+--    }
+    --    ball:setColor(_tagColor[tagNum])
+    
+    local addNum = MAX_BULLET - _bullet
+    
+    local kindId = math.random(1,5)
+    local ball = Ball:create(kindId)
 
-    ball:setPosition(winSize.width/2,winSize.height - 30)
+    local randomX = math.random(1.5,4)
+    ball:setPosition(winSize.width/randomX,winSize.height - 130)
 
     local pBall = ball:getPhysicsBody()
     pBall:setTag(Tag.T_Bullet)
-    self:addChild(ball,ZOrder.Z_Bullet,tagNum+2)
+    self:addChild(ball,ZOrder.Z_Bullet,kindId+2)
     _bullet = _bullet + 1
 end
 
@@ -133,7 +137,7 @@ function GameLayer:addATKSprite()
     local function callBack(event)
         local data = event._data.data
         local card = SpriteCard:createSprite(data,self)
-        --        card:setPosition(30,120)
+        card:setPosition(30,120)
         self:addChild(card,1002)
 
         print("############# ADD_CARD_TO_GAME_LAYER "..data.atk)
@@ -323,18 +327,16 @@ end
 -- Playerをinitする
 function GameLayer:initSpritePlayer()
     self.player = SpritePlayer:create()
-    self.player:setPositionY(offside)
+--    self.player:setPositionY(offside)
     self:addChild(self.player, 0, 1001)
 end
 
 -- PlayerRightをinitする
 function GameLayer:initSpritePlayerRight()
     self.playerRight = SpritePlayerRight:create(true)
-    self.playerRight:setPositionY(offside)
+--    self.playerRight:setPositionY(offside)
     self:addChild(self.playerRight, 0, 1001)
 end
-
-
 
 
 -- 更新时间
@@ -361,10 +363,6 @@ function GameLayer:update(dt)
     end
 
     self:DrawLineRemove()
-    
-    if next(_bulletVicts) ~= nil then
-        print("############## CAONIMA")
-    end
     
     local node = DrawLine:create(_bulletVicts)
     self:addChild(node,ZOrder.Z_Line,Tag.T_Line)
