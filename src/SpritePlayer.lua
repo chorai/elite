@@ -47,9 +47,9 @@ function SpritePlayer:addArmature()
     node:runAction(self.action)
     self.action:play("idel", true)
     node:setScale(0.5)
---    node:setPosition(node:getContentSize().width + 20,0)
+    --    node:setPosition(node:getContentSize().width + 20,0)
     self:addChild(node)
-    
+
     local function onFrameEvent(frame)
         if nil == frame then
             return
@@ -58,17 +58,32 @@ function SpritePlayer:addArmature()
         if str == "hurted" then
             self.action:play("idel", true)
         elseif(str == "atked") then
+
             self.action:play("idel", true)
         end
     end
     self.action:setFrameEventCallFunc(onFrameEvent)
-    
+
     local function callBack(event)
         local data = event._data
-        self.action:play(data.action, false)
+        self:playEvent(data)
     end
---    EventDispatchManager:createEventDispatcher(self,"SELECT_CARD_FROM_FOOTER",callBack)
+    --    EventDispatchManager:createEventDispatcher(self,"SELECT_CARD_FROM_FOOTER",callBack)
     EventDispatchManager:createEventDispatcher(self,"SPRITE_PLAYER_EVENT",callBack)
+end
+
+function SpritePlayer:playEvent(data)
+    --动作
+    self.action:play(data.action, false)
+    --射了 Oh yeah  发射攻击物体
+    self:atking(data.type)
+end
+
+--发射攻击物体
+function SpritePlayer:atking(type)
+    if type then
+        print("########## ATKING #######"..type)
+    end
 end
 
 function SpritePlayer:broadCastEvent(data)
@@ -101,10 +116,10 @@ function SpritePlayer:init()
     --    self.action:setCascadeOpacityEnabled(false)
     hp:setCascadeOpacityEnabled(false)
 
---    self:setPhysicsBody(cc.PhysicsBody:createCircle(self:getContentSize().width/2))
---    self:getPhysicsBody():setCategoryBitmask(CATEGORY_MASK_PLAYER_A)
---    self:getPhysicsBody():setCollisionBitmask(COLLISION_MASK_PLAYER_A)
---    self:getPhysicsBody():setContactTestBitmask(CONTACTTEST_MASK_PLAYER_A)
+    --    self:setPhysicsBody(cc.PhysicsBody:createCircle(self:getContentSize().width/2))
+    --    self:getPhysicsBody():setCategoryBitmask(CATEGORY_MASK_PLAYER_A)
+    --    self:getPhysicsBody():setCollisionBitmask(COLLISION_MASK_PLAYER_A)
+    --    self:getPhysicsBody():setContactTestBitmask(CONTACTTEST_MASK_PLAYER_A)
 end
 --------------------------------------------------------------------------------
 -- attack

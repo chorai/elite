@@ -299,15 +299,16 @@ function GameLayer:addTouch()
             for key, var in ipairs(_bullets) do
                 if var:getState() == Ball.MOVING then
                     var:brokenBullet()
-                    
-                    local data = {
-                        action = "atk"
-                    }
-                    self.player:broadCastEvent(data)
-                    
                     _bullet = _bullet - 1
                 end
             end
+            
+            local data = {
+                action = "atk",
+                type = "1",
+            }
+            self.player:broadCastEvent(data)
+            
         end
         _bullets = {}
     end
