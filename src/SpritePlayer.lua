@@ -64,9 +64,15 @@ function SpritePlayer:addArmature()
     self.action:setFrameEventCallFunc(onFrameEvent)
     
     local function callBack(event)
-        self.action:play("atk", false)
+        local data = event._data
+        self.action:play(data.action, false)
     end
-    EventDispatchManager:createEventDispatcher(self,"SELECT_CARD_FROM_FOOTER",callBack)
+--    EventDispatchManager:createEventDispatcher(self,"SELECT_CARD_FROM_FOOTER",callBack)
+    EventDispatchManager:createEventDispatcher(self,"SPRITE_PLAYER_EVENT",callBack)
+end
+
+function SpritePlayer:broadCastEvent(data)
+    EventDispatchManager:broadcastEventDispatcher("SPRITE_PLAYER_EVENT",data)
 end
 --------------------------------------------------------------------------------
 -- init
