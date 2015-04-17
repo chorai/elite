@@ -4,7 +4,7 @@
 -- @date 2014/12/24
 -- @author  Cho Rai
 SpritePlayerRight = class("SpritePlayerRight", function()
-    return cc.Sprite:create()
+    return cc.Sprite:create("fireball_2.png")
 end)
 SpritePlayerRight.active            = nil
 SpritePlayerRight.canBeAttack       = nil
@@ -42,7 +42,6 @@ function SpritePlayerRight:create(isAI)
     local plane = SpritePlayerRight.new()
     plane.isAI = isAI
     plane:init()
-    plane:addAttack()
     return plane
 end
 
@@ -53,7 +52,7 @@ function SpritePlayerRight:addArmature()
     self.action:play("idel", true)
     node:setScale(0.3)
 --    node:setPosition(node:getContentSize().width + 20,0)
-    self:addChild(node)
+--    self:addChild(node)
 
     local function onFrameEvent(frame)
         if nil == frame then
@@ -82,7 +81,7 @@ function SpritePlayerRight:init()
     self:setSpriteFrame(sp0)
     self.size = self:getContentSize()
     self:setPosition(cc.p(WIN_SIZE.width - 30, WIN_SIZE.height/2 + 120))
-
+    self:setTextureRect(cc.rect(0,0,self:getContentSize().width,self:getContentSize().height))
     -- hp value
     self.label_hp = cc.Label:createWithBMFont("Font/arial-14.fnt", self.hp)
     self.label_hp:setSystemFontSize(30)
@@ -96,13 +95,9 @@ function SpritePlayerRight:init()
     self:addChild(hp)
     self.label_hp:setPosition(hp:getContentSize().width/2,hp:getContentSize().height/2)
 
-    self:setOpacity(0)
-    hp:setCascadeOpacityEnabled(false)
+--    self:setOpacity(0)
+--    hp:setCascadeOpacityEnabled(false)
     
---    self:setPhysicsBody(cc.PhysicsBody:createBox(self:getContentSize()))
---    self:getPhysicsBody():setCategoryBitmask(CATEGORY_MASK_PLAYER_B)
---    self:getPhysicsBody():setCollisionBitmask(COLLISION_MASK_PLAYER_B)
---    self:getPhysicsBody():setContactTestBitmask(CONTACTTEST_MASK_PLAYER_B)
 end
 --------------------------------------------------------------------------------
 -- attack

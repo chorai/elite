@@ -3,6 +3,7 @@
 -- 【クラス】Player
 -- @date 2014/12/24
 -- @author  Cho Rai
+local SpriteATK = require("SpriteATK")
 SpritePlayer = class("SpritePlayer", function()
     return cc.Sprite:create()
 end)
@@ -18,6 +19,8 @@ SpritePlayer.delayTime          = nil
 SpritePlayer.size               = nil
 SpritePlayer.label_hp           = nil
 SpritePlayer.slider_hp          = nil
+
+SpritePlayer.spriteAtk          = nil
 
 SpritePlayer.action     = nil
 --------------------------------------------------------------------------------
@@ -83,6 +86,9 @@ end
 function SpritePlayer:atking(type)
     if type then
         print("########## ATKING #######"..type)
+--        local data = {}
+--        self.spriteAtk = SpriteATK:createSprite(data)
+--        self:addChild(self.spriteAtk)
     end
 end
 

@@ -3,6 +3,9 @@ local GameFooter = require("GameFooter")
 require("VisibleRect")
 local Ball = require("Ball")
 local DrawLine = require("DrawLine")
+local SpriteBoss = require("SpriteBoss")
+
+
 GameLayer = class("GameLayer", function()
     return cc.Layer:create()
 end)
@@ -16,6 +19,8 @@ GameLayer.lbLifeCount = nil             -- 显示生命值
 
 GameLayer.player = nil                  -- Player (自分)
 GameLayer.playerRight = nil             -- PlayerRight (相手)
+
+GameLayer.boss = nil             -- boss
 
 GameLayer.footer = nil
 GameLayer.name = nil
@@ -66,24 +71,25 @@ end
 
 
 function GameLayer:init()
---    self:loadingMusic() -- 背景音乐
+    --    self:loadingMusic() -- 背景音乐
     self:addBG()        -- 初始化背景
     --    self:moveBG()       -- 背景移动
---    self:addBtn()       -- 游戏暂停按钮
---    self:addFooter()
-    
---    self:addContact()   -- 碰撞检测
+    --    self:addBtn()       -- 游戏暂停按钮
+    --    self:addFooter()
+
+    --    self:addContact()   -- 碰撞检测
 
     Global:getInstance():resetGame()    -- 初始化全局变量
     self:initGameState()                -- 初始化游戏数据状态
-    self:initSpritePlayer()             -- 初期化（自分）
-    self:initSpritePlayerRight()        -- 初期化（相手）
---    self:addATKSprite()
+--    self:initSpritePlayer()             -- 初期化（自分）
+--    self:initSpritePlayerRight()        -- 初期化（相手）
+
+    self:initSpriteBoss()
     self:addPuzzle()
-    
+
     self:addSchedule()  -- 更新
     self:addTouch()     -- 触摸
-    
+
     _bulletVicts = {}
     _fingerPosition = nil
 end
@@ -100,8 +106,8 @@ function GameLayer:addPuzzle()
             cc.p(winSize.width-1, winSize.height-1),
         }
     local wall = cc.Node:create()
---    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
-    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0,0,0.5),10)
+    --    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
+    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0,0,0.5),20)
     wall:setPhysicsBody(edge)
     --    wall:setPosition(0,0)
     wall:setPosition(VisibleRect:center())
@@ -110,39 +116,17 @@ function GameLayer:addPuzzle()
 end
 
 function GameLayer:showBullet()
---    local _tagColor = {
---        [1] = cc.c3b(102,255,51),
---        [2] = cc.c3b(255,153,255),
---        [3] = cc.c3b(204,0,0),
---        [4] = cc.c3b(51,51,204),
---        [5] = cc.c3b(255,255,255),
---    }
-    --    ball:setColor(_tagColor[tagNum])
-    
     local addNum = MAX_BULLET - _bullet
-    
     local kindId = math.random(1,5)
     local ball = Ball:create(kindId)
 
     local randomX = math.random(1.5,4)
-    ball:setPosition(winSize.width/randomX,winSize.height - 130)
+    ball:setPosition(winSize.width/randomX,winSize.height - 200)
 
     local pBall = ball:getPhysicsBody()
     pBall:setTag(Tag.T_Bullet)
     self:addChild(ball,ZOrder.Z_Bullet,kindId+2)
     _bullet = _bullet + 1
-end
-
-function GameLayer:addATKSprite()
-    local function callBack(event)
-        local data = event._data.data
-        local card = SpriteCard:createSprite(data,self)
-        card:setPosition(30,120)
-        self:addChild(card,1002)
-
-        print("############# ADD_CARD_TO_GAME_LAYER "..data.atk)
-    end
-    EventDispatchManager:createEventDispatcher(self,"ADD_CARD_TO_GAME_LAYER",callBack)
 end
 
 -- 播放音乐
@@ -272,7 +256,7 @@ function GameLayer:addTouch()
         if bullet ~= nil and bullet:getState() == Ball.MOVING then
             if next(_bullets) == nil then
                 _bullets[touchIdx] = bullet
---                touchIdx = touchIdx + 1
+                --                touchIdx = touchIdx + 1
             elseif isTableContains(_bullets,bullet) == false then
                 local p1 = _bullets[#_bullets]:getPosition()
                 local p2 = bullet:getPosition()
@@ -302,13 +286,13 @@ function GameLayer:addTouch()
                     _bullet = _bullet - 1
                 end
             end
-            
+            print("##################"..#_bullets)
             local data = {
-                action = "atk",
+                action = "hurt",
+                damage = #_bullets,
                 type = "1",
             }
-            self.player:broadCastEvent(data)
-            
+            self.boss:broadCastEvent(data)
         end
         _bullets = {}
     end
@@ -334,15 +318,21 @@ end
 -- Playerをinitする
 function GameLayer:initSpritePlayer()
     self.player = SpritePlayer:create()
---    self.player:setPositionY(offside)
+    --    self.player:setPositionY(offside)
     self:addChild(self.player, 0, 1001)
 end
 
 -- PlayerRightをinitする
 function GameLayer:initSpritePlayerRight()
     self.playerRight = SpritePlayerRight:create(true)
---    self.playerRight:setPositionY(offside)
-    self:addChild(self.playerRight, 0, 1001)
+    --    self.playerRight:setPositionY(offside)
+    self:addChild(self.playerRight)
+end
+
+-- BOSSをinitする
+function GameLayer:initSpriteBoss()
+    self.boss = SpriteBoss:create()
+    self:addChild(self.boss)
 end
 
 
@@ -370,7 +360,7 @@ function GameLayer:update(dt)
     end
 
     self:DrawLineRemove()
-    
+
     local node = DrawLine:create(_bulletVicts)
     self:addChild(node,ZOrder.Z_Line,Tag.T_Line)
     _bulletVicts = {}

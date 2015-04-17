@@ -31,11 +31,11 @@ end
 function Ball:init(kind)
     self:setTexture(cc.Director:getInstance():getTextureCache():addImage(self.kind[kind]))
     local size = self:getContentSize()
-    if kind == 2 then
-        self.scalePer = 0.4
-    else
-        self.scalePer= 0.25
-    end
+--    if kind == 2 then
+--        self.scalePer = 0.4
+--    else
+--        self.scalePer= 0.25
+--    end
     self:setScale(self.scalePer)
     self.size = (size.width/2) * self.scalePer
     local pBall = cc.PhysicsBody:createCircle((size.width/2) * self.scalePer, cc.PhysicsMaterial(1, 0, 0.4))
