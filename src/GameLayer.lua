@@ -117,15 +117,15 @@ end
 
 function GameLayer:showBullet()
     local addNum = MAX_BULLET - _bullet
-    local kindId = math.random(1,5)
-    local ball = Ball:create(kindId)
+    local typeId = math.random(1,5)
+    local ball = Ball:create(typeId)
 
     local randomX = math.random(1.5,4)
     ball:setPosition(winSize.width/randomX,winSize.height - 200)
 
     local pBall = ball:getPhysicsBody()
     pBall:setTag(Tag.T_Bullet)
-    self:addChild(ball,ZOrder.Z_Bullet,kindId+2)
+    self:addChild(ball,ZOrder.Z_Bullet,typeId+2)
     _bullet = _bullet + 1
 end
 
@@ -280,19 +280,24 @@ function GameLayer:addTouch()
 
     local function onTouchEnded(touch, event)
         if next(_bullets) ~= nil and #_bullets > 2 then
+            local type = 1
+            local lastPos = nil
             for key, var in ipairs(_bullets) do
                 if var:getState() == Ball.MOVING then
                     var:brokenBullet()
+                    type = var:getType()
+                    lastPos = var:getPosition()
                     _bullet = _bullet - 1
                 end
             end
-            print("##################"..#_bullets)
             local data = {
                 action = "hurt",
-                damage = #_bullets,
-                type = "1",
+                type = type,
+                count = #_bullets,
             }
             self.boss:broadCastEvent(data)
+            local bossPos = self.boss:getPosition()
+            self:addAtkEffect(lastPos,bossPos)
         end
         _bullets = {}
     end
@@ -444,6 +449,14 @@ function GameLayer:addContact()
     dispatcher:addEventListenerWithSceneGraphPriority(contactListener, self)
 end
 
+function GameLayer:addAtkEffect(from,to)
+    local emitter = cc.ParticleSystemQuad:create("particle_atk2.plist")
+    self:addChild(emitter,1111111)
+    emitter:setPosition(from)
+    local action1 = cc.MoveTo:create(0.3,to)
+    local action2 = cc.RemoveSelf:create()
+    emitter:runAction(cc.Sequence:create(action1, action2))  
+end
 
 function GameLayer:DrawLineRemove()
     local nodes = self:getChildren()

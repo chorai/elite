@@ -7,11 +7,12 @@ Ball.MOVING = 0
 Ball.BROKEN = 1
 
 Ball._state = 0
+Ball._type = 0
 
 Ball.size = 0
-Ball.scalePer = 0.25 -- TODO 这个要弄成可变的！！
+Ball.scalePer = 0.3 -- TODO 这个要弄成可变的！！
 
-Ball.kind = {
+Ball.type = {
     [1] = "ball_adore.png",
     [2] = "ball_boom.png",
     [3] = "ball_boss.png",
@@ -22,16 +23,17 @@ Ball.kind = {
 function Ball:ctor()
 end
 
-function Ball:create(kind)
+function Ball:create(type)
     local ball = Ball.new()
-    ball:init(kind)
+    ball:init(type)
     return ball
 end
 
-function Ball:init(kind)
-    self:setTexture(cc.Director:getInstance():getTextureCache():addImage(self.kind[kind]))
+function Ball:init(type)
+    self._type = type
+    self:setTexture(cc.Director:getInstance():getTextureCache():addImage(self.type[type]))
     local size = self:getContentSize()
---    if kind == 2 then
+--    if type == 2 then
 --        self.scalePer = 0.4
 --    else
 --        self.scalePer= 0.25
@@ -65,6 +67,10 @@ end
 
 function Ball:getState()
     return self._state
+end
+
+function Ball:getType()
+    return self._type
 end
 
 return Ball

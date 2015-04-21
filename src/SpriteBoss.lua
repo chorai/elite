@@ -21,6 +21,15 @@ SpriteBoss.slider_hp          = nil
 SpriteBoss.action             = nil
 
 local SPRITE_EVENT            = "SPRITE_BOSS_EVENT"
+
+SpriteBoss.damage = {
+    [1] = 123,
+    [2] = 123,
+    [3] = 123,
+    [4] = 123,
+    [5] = 123,
+}
+
 --------------------------------------------------------------------------------
 -- ctor
 function SpriteBoss:ctor()
@@ -48,7 +57,6 @@ function SpriteBoss:addArmature()
     node:runAction(self.action)
     self.action:play("idel", true)
     self:addChild(node)
-
     local function onFrameEvent(frame)
         if nil == frame then
             return
@@ -72,6 +80,7 @@ function SpriteBoss:addArmature()
 end
 
 function SpriteBoss:playEvent(data)
+    self:addDamage(data)
     self.action:play(data.action, false)
 end
 
@@ -88,13 +97,13 @@ function SpriteBoss:init()
     self.label_hp:setSystemFontSize(30)
     self.label_hp:setColor(cc.c3b(255,255, 255))
 
---    local hp = ccui.ImageView:create()
---    hp:setScale(0.3)
---    hp:setPosition(self.size.width/2 ,self.size.height + 20)
---    hp:loadTexture("status_hp.png")
---    hp:addChild(self.label_hp)
---    self:addChild(hp)
---    self.label_hp:setPosition(hp:getContentSize().width/2,hp:getContentSize().height/2)
+    --    local hp = ccui.ImageView:create()
+    --    hp:setScale(0.3)
+    --    hp:setPosition(self.size.width/2 ,self.size.height + 20)
+    --    hp:loadTexture("status_hp.png")
+    --    hp:addChild(self.label_hp)
+    --    self:addChild(hp)
+    --    self.label_hp:setPosition(hp:getContentSize().width/2,hp:getContentSize().height/2)
 end
 --------------------------------------------------------------------------------
 -- attack
@@ -128,6 +137,47 @@ function SpriteBoss:destroy()
         cc.SimpleAudioEngine:getInstance():playEffect("Music/shipDestroyEffect.mp3")
     end
     self:removeFromParent()
+end
+
+function SpriteBoss:addDamage(data)
+    local labelAtlas = ccui.TextAtlas:create()
+
+    local count = data.count
+    local type = data.type
+
+    local function actionEnd()
+    end
+
+    local damage = 0
+    if count >= 4 then
+        damage = self.damage[type] * count * 2 -- 4个以上伤害x2
+        local action1 = cc.ScaleTo:create(0.1, 2)
+        local action2 = cc.ScaleTo:create(0.1, 1.5)
+        local action3 = cc.DelayTime:create(1.5)
+        local action4 = cc.FadeOut:create(0.5)
+        local action5 = cc.DelayTime:create(0.5)
+        local action6 = cc.RemoveSelf:create()
+        local action7 = cc.CallFunc:create(actionEnd)
+        labelAtlas:runAction(cc.Sequence:create(action1, action2,action3,action4,action5,action6,action7))
+    else
+        damage = self.damage[type] * count
+        local action1 = cc.MoveBy:create(2,cc.p(0,80))
+        local action2 = cc.FadeOut:create(2)
+        local action = cc.Spawn:create(action1,action2)
+        local action4 = cc.RemoveSelf:create()
+        labelAtlas:runAction(cc.Sequence:create(action,action4))
+    end
+
+    labelAtlas:setProperty(damage, "labelatlas.png", 17, 22, "0")
+    labelAtlas:setPosition(self:getContentSize().width/2,self:getContentSize().height)
+    self:addChild(labelAtlas)
+end
+
+function SpriteBoss:getPosition()
+    local pos = {}
+    pos.x = self:getPositionX()
+    pos.y = self:getPositionY()
+    return pos
 end
 
 return SpriteBoss
