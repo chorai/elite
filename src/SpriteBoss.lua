@@ -35,7 +35,7 @@ SpriteBoss.damage = {
 function SpriteBoss:ctor()
     self.active = true
     self.canBeAttack = false
-    self.hp = 20
+    self.hp = 5000
     self.atk = 10000
     self.power = 1.0
     self.speed = 220
@@ -113,7 +113,7 @@ end
 -- hurt
 function SpriteBoss:hurt(damageValue)
     self.hp = self.hp - damageValue
-    self.label_hp:setString(self.hp)
+--    self.label_hp:setString(self.hp)
 
     self.action:play("hurt",false)
     if self.hp <= 0 then
@@ -171,6 +171,8 @@ function SpriteBoss:addDamage(data)
     labelAtlas:setProperty(damage, "labelatlas.png", 17, 22, "0")
     labelAtlas:setPosition(self:getContentSize().width/2,self:getContentSize().height)
     self:addChild(labelAtlas)
+    
+    self:hurt(damage)
 end
 
 function SpriteBoss:getPosition()

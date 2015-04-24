@@ -22,6 +22,8 @@ GameLayer.playerRight = nil             -- PlayerRight (相手)
 
 GameLayer.boss = nil             -- boss
 
+GameLayer.wall = nil
+
 GameLayer.footer = nil
 GameLayer.name = nil
 
@@ -105,14 +107,13 @@ function GameLayer:addPuzzle()
             cc.p(winSize.width-1, 100),
             cc.p(winSize.width-1, winSize.height-1),
         }
-    local wall = cc.Node:create()
+    self.wall = cc.Node:create()
     --    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
-    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height-1),cc.PhysicsMaterial(0,0,0.5),20)
-    wall:setPhysicsBody(edge)
-    --    wall:setPosition(0,0)
-    wall:setPosition(VisibleRect:center())
-
-    self:addChild(wall)
+    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height),cc.PhysicsMaterial(0,0,0.5),20)
+    self.wall:setPhysicsBody(edge)
+--    wall:setPosition(VisibleRect:bottom())
+    self.wall:setPosition(cc.p(WIN_SIZE.width/2,WIN_SIZE.height/2))
+    self:addChild(self.wall)
 end
 
 function GameLayer:showBullet()
@@ -120,8 +121,8 @@ function GameLayer:showBullet()
     local typeId = math.random(1,5)
     local ball = Ball:create(typeId)
 
-    local randomX = math.random(1.5,4)
-    ball:setPosition(winSize.width/randomX,winSize.height - 200)
+    local randomX = math.random(1,winSize.width)
+    ball:setPosition(winSize.width - randomX, 400)
 
     local pBall = ball:getPhysicsBody()
     pBall:setTag(Tag.T_Bullet)
@@ -143,13 +144,12 @@ end
 
 -- 添加背景
 function GameLayer:addBG()
-    self.bg1 = cc.Sprite:create("bg_01.jpg")
+    self.bg1 = cc.Sprite:create("bg.jpg")
     --    self.bg2 = cc.Sprite:create("bg_01.jpg")
-    self.bg1:setAnchorPoint(cc.p(0, 0))
     --    self.bg2:setAnchorPoint(cc.p(0, 0))
     self.bg1:setPosition(0, offside)
-    self.bg1:setScale(0.35)
-    --    self.bg2:setPosition(0, self.bg1:getContentSize().height)
+--    self.bg1:setScale(0.5)
+--    self.bg2:setPosition(0, self.bg1:getContentSize().height)
     self:addChild(self.bg1, -10)
     --    self:addChild(self.bg2, -10)
 end
@@ -382,10 +382,10 @@ end
 
 -- 战机重生,或游戏结束
 function GameLayer:checkGameOver()
-    if self.player == nil or self.playerRight == nil then
+    if self.boss == nil then
         return
     end
-    if self.player:isActive() == false or self.playerRight:isActive() == false then
+    if self.boss:isActive() == false then
         self.gameState = self.stateGameOver
         self:gameOver()
     end

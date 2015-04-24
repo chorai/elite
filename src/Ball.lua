@@ -40,7 +40,7 @@ function Ball:init(type)
 --    end
     self:setScale(self.scalePer)
     self.size = (size.width/2) * self.scalePer
-    local pBall = cc.PhysicsBody:createCircle((size.width/2) * self.scalePer, cc.PhysicsMaterial(1, 0, 0.4))
+    local pBall = cc.PhysicsBody:createCircle(((size.width-10)/2) * self.scalePer, cc.PhysicsMaterial(1, 0, 0.4))
     --    local w = (size.width/2) * self.scalePer
     --    local pBall = cc.PhysicsBody:createBox(cc.size(w, w),cc.PhysicsMaterial(1, 0.6, 0.3))
     pBall:setDynamic(true)
