@@ -17,8 +17,10 @@ function DrawLine:init(vecs)
     local temVec = nil
     if vecs ~= nil then
         for key, var in ipairs(vecs) do
+            --每个点上加圆圈！！！！
+            self:drawSolidCircle(cc.p(var.x,var.y),3, math.pi/2, 50, 2.0, 2.0, cc.c4f(1.0, 1.0, 1.0, 1.0))
             if temVec ~=nil then
-                self:drawSegment(cc.p(temVec.x,temVec.y),cc.p(var.x,var.y),3,cc.c4f(1.0, 1.0, 1.0, 1.0))
+                self:drawSegment(cc.p(temVec.x,temVec.y),cc.p(var.x,var.y),1.5,cc.c4f(1.0, 1.0, 1.0, 1.0))
             end
             temVec = var
         end
