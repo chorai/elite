@@ -1,4 +1,10 @@
 
+-- FileUtils
+cc.FileUtils:getInstance():addSearchPath("src")
+cc.FileUtils:getInstance():addSearchPath("res")
+cc.FileUtils:getInstance():addSearchPath("res/Font")
+cc.FileUtils:getInstance():addSearchPath("res/Music")
+
 require "cocos.init"
 require("src/Require")
 -- cclog

@@ -1,9 +1,3 @@
--- FileUtils
-cc.FileUtils:getInstance():addSearchPath("src")
-cc.FileUtils:getInstance():addSearchPath("res")
-cc.FileUtils:getInstance():addSearchPath("res/Font")
-cc.FileUtils:getInstance():addSearchPath("res/Music")
-
 
 -- addSpriteFramesWithFile -> addSpriteFrames
 cc.SpriteFrameCache:getInstance():addSpriteFrames("bullet.plist")
