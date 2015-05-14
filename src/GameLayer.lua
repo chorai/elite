@@ -4,7 +4,7 @@ require("VisibleRect")
 local Ball = require("Ball")
 local DrawLine = require("DrawLine")
 local SpriteBoss = require("SpriteBoss")
-
+local SpritePlayer = require("SpritePlayer")
 
 GameLayer = class("GameLayer", function()
     return cc.Layer:create()
@@ -18,9 +18,7 @@ GameLayer.lbScore = nil                 -- 分数
 GameLayer.lbLifeCount = nil             -- 显示生命值
 
 GameLayer.player = nil                  -- Player (自分)
-GameLayer.playerRight = nil             -- PlayerRight (相手)
-
-GameLayer.boss = nil             -- boss
+GameLayer.boss = nil                    -- boss
 
 GameLayer.wall = nil
 
@@ -77,16 +75,12 @@ function GameLayer:init()
     self:addBG()        -- 初始化背景
     --    self:moveBG()       -- 背景移动
     --    self:addBtn()       -- 游戏暂停按钮
-    --    self:addFooter()
-
-    --    self:addContact()   -- 碰撞检测
 
     Global:getInstance():resetGame()    -- 初始化全局变量
     self:initGameState()                -- 初始化游戏数据状态
---    self:initSpritePlayer()             -- 初期化（自分）
---    self:initSpritePlayerRight()        -- 初期化（相手）
+    self:addPlayer()             -- 初期化（自分）
 
-    self:initSpriteBoss()
+    self:addSpriteBoss()
     self:addPuzzle()
 
     self:addSchedule()  -- 更新
@@ -109,7 +103,7 @@ function GameLayer:addPuzzle()
         }
     self.wall = cc.Node:create()
     --    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
-    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width-1,winSize.height),cc.PhysicsMaterial(0,0,0.5),20)
+    local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width + 40,winSize.height),cc.PhysicsMaterial(0,0,0.5),20)
     self.wall:setPhysicsBody(edge)
 --    wall:setPosition(VisibleRect:bottom())
     self.wall:setPosition(cc.p(WIN_SIZE.width/2,WIN_SIZE.height/2))
@@ -310,7 +304,6 @@ function GameLayer:addTouch()
     dispatcher:addEventListenerWithSceneGraphPriority(listener, self)
 end
 
-
 -- 初始化游戏数据状态
 function GameLayer:initGameState()
     -- 游戏状态
@@ -319,23 +312,14 @@ function GameLayer:initGameState()
     self.gameTime = 0
 end
 
-
--- Playerをinitする
-function GameLayer:initSpritePlayer()
+-- Playerを追加する
+function GameLayer:addPlayer()
     self.player = SpritePlayer:create()
-    --    self.player:setPositionY(offside)
-    self:addChild(self.player, 0, 1001)
-end
-
--- PlayerRightをinitする
-function GameLayer:initSpritePlayerRight()
-    self.playerRight = SpritePlayerRight:create(true)
-    --    self.playerRight:setPositionY(offside)
-    self:addChild(self.playerRight)
+    self:addChild(self.player, 2, 1001)
 end
 
 -- BOSSをinitする
-function GameLayer:initSpriteBoss()
+function GameLayer:addSpriteBoss()
     self.boss = SpriteBoss:create()
     self:addChild(self.boss)
 end
@@ -380,13 +364,18 @@ function GameLayer:updateGame()
     end
 end
 
--- 战机重生,或游戏结束
+-- 游戏结束 or 使用道具
 function GameLayer:checkGameOver()
     if self.boss == nil then
         return
     end
-    if self.boss:isActive() == false then
+    if  self.boss:isActive() == false then
         self.gameState = self.stateGameOver
+        --You Win
+        self:gameOver()
+    elseif self.player:isActive() == false then
+        self.gameState = self.stateGameOver
+        --You Win
         self:gameOver()
     end
 end
@@ -429,25 +418,6 @@ function GameLayer:getShip()
 end
 
 
-function GameLayer:addContact()
-    local function onContactBegin(contact)
-        local a = contact:getShapeA():getBody():getNode()
-        local b = contact:getShapeB():getBody():getNode()
-        if a ~= nil and b ~= nil then
-            if a:isActive() and b:isActive() then
-                a:hurt(b.atk)
-                b:hurt(a.atk)
-            end
-
-        end
-        return true
-    end
-
-    local dispatcher = self:getEventDispatcher()
-    local contactListener = cc.EventListenerPhysicsContact:create()
-    contactListener:registerScriptHandler(onContactBegin, cc.Handler.EVENT_PHYSICS_CONTACT_BEGIN)
-    dispatcher:addEventListenerWithSceneGraphPriority(contactListener, self)
-end
 
 function GameLayer:addAtkEffect(from,to)
     local emitter = cc.ParticleSystemQuad:create("particle_atk2.plist")

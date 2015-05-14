@@ -22,7 +22,7 @@ SpritePlayerRight.isAI = false
 SpritePlayerRight.label_hp = nil
 SpritePlayerRight.slider_hp = nil
 
-SpritePlayer.action     = nil
+SpritePlayerRight.action     = nil
 --------------------------------------------------------------------------------
 -- ctor
 function SpritePlayerRight:ctor()

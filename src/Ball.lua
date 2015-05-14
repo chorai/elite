@@ -29,11 +29,11 @@ Ball.scalePer = 0.32 -- TODO 这个要弄成可变的！！
 --}
 
 Ball.type = {
-    [1] = "mage_1.png",
-    [2] = "mage_2.png",
-    [3] = "mage_3.png",
+    [1] = "mage_1.png", --毒
+    [2] = "mage_2.png", --ATK
+    [3] = "mage_3.png", --DEF
     [4] = "mage_4.png",
-    [5] = "mage_5.png",
+    [5] = "mage_5.png",--freeze
 }
 
 function Ball:ctor()
@@ -49,10 +49,10 @@ function Ball:init(type)
   
     local _tagColor = {
         [1] = cc.c3b(30,92,9),
-        [2] = cc.c3b(239,225,13),
-        [3] = cc.c3b(239,255,180),
-        [4] = cc.c3b(2,105,248),
-        [5] = cc.c3b(255,255,255),
+        [2] = cc.c3b(2,105,248),
+        [3] = cc.c3b(255,225,255),
+        [4] = cc.c3b(239,255,180),
+        [5] = cc.c3b(239,225,13),
     }
     self:setColor(_tagColor[type])
     

@@ -6,6 +6,7 @@
 local SpriteBoss = class("SpriteBoss", function()
     return cc.Sprite:create()
 end)
+SpriteBoss.node             = nil
 SpriteBoss.active             = nil
 SpriteBoss.canBeAttack        = nil
 SpriteBoss.hp                 = nil
@@ -19,8 +20,10 @@ SpriteBoss.size               = nil
 SpriteBoss.label_hp           = nil
 SpriteBoss.slider_hp          = nil
 SpriteBoss.action             = nil
+SpriteBoss.time               = nil
 
 local SPRITE_EVENT            = "SPRITE_BOSS_EVENT"
+local SPRITE_EVENT_ATK        = "SPRITE_EVENT_ATK"
 
 SpriteBoss.damage = {
     [1] = 123,
@@ -30,18 +33,44 @@ SpriteBoss.damage = {
     [5] = 123,
 }
 
+SpriteBoss.debuff    = {
+    type = nil,
+    value = nil,
+}
+
+
+SpriteBoss.color = {
+    [0] = cc.c3b(255,255,255),
+    [1] = cc.c3b(30,92,9),
+    [2] = cc.c3b(239,225,13),
+    [3] = cc.c3b(239,255,180),
+    [4] = cc.c3b(2,105,248),
+    [5] = cc.c3b(255,255,255),
+}
+
 --------------------------------------------------------------------------------
 -- ctor
 function SpriteBoss:ctor()
     self.active = true
     self.canBeAttack = false
-    self.hp = 5000
+    self.hp = 500000
     self.atk = 10000
     self.power = 1.0
     self.speed = 220
     self.bulleSpeed = 900
     self.bulletPowerValue = 1
     self.delayTime = 0.1
+end
+--------------------------------------------------------------------------------
+-- init
+function SpriteBoss:init()
+    self:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height))
+    self:addArmature()
+    self:addHp()
+    self:addEventDispatcher()
+    self:addAI()
+    -- BOSS时间
+    self.time = 0
 end
 --------------------------------------------------------------------------------
 -- create
@@ -52,11 +81,14 @@ function SpriteBoss:create()
 end
 
 function SpriteBoss:addArmature()
-    local node = cc.CSLoader:createNode("huchey.csb")
+    self.node = cc.CSLoader:createNode("huchey.csb")
     self.action = cc.CSLoader:createTimeline("huchey.csb")
-    node:runAction(self.action)
+    self.node:runAction(self.action)
     self.action:play("idel", true)
-    self:addChild(node)
+    self.node:setPosition(0,-180)
+
+    self:addChild(self.node)
+
     local function onFrameEvent(frame)
         if nil == frame then
             return
@@ -70,50 +102,35 @@ function SpriteBoss:addArmature()
         end
     end
     self.action:setFrameEventCallFunc(onFrameEvent)
-
-    local function callBack(event)
-        local data = event._data
-        self:playEvent(data)
-    end
-    --    EventDispatchManager:createEventDispatcher(self,"SELECT_CARD_FROM_FOOTER",callBack)
-    EventDispatchManager:createEventDispatcher(self,SPRITE_EVENT,callBack)
 end
 
-function SpriteBoss:playEvent(data)
-    self:addDamage(data)
-    self.action:play(data.action, false)
+function SpriteBoss:addEventDispatcher()
+    local function callBack(event)
+        local data = event._data
+        if data.action == "hurt" then
+            self:addHurt(data)
+        end
+        self.action:play(data.action, false)
+    end
+    EventDispatchManager:createEventDispatcher(self,SPRITE_EVENT,callBack)
 end
 
 function SpriteBoss:broadCastEvent(data)
     EventDispatchManager:broadcastEventDispatcher(SPRITE_EVENT,data)
 end
 --------------------------------------------------------------------------------
--- init
-function SpriteBoss:init()
-    self:addArmature()
-    self:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2 + 80))
-    -- hp value
-    self.label_hp = cc.Label:createWithBMFont("Font/arial-14.fnt", self.hp)
-    self.label_hp:setSystemFontSize(30)
-    self.label_hp:setColor(cc.c3b(255,255, 255))
-
-    --    local hp = ccui.ImageView:create()
-    --    hp:setScale(0.3)
-    --    hp:setPosition(self.size.width/2 ,self.size.height + 20)
-    --    hp:loadTexture("status_hp.png")
-    --    hp:addChild(self.label_hp)
-    --    self:addChild(hp)
-    --    self.label_hp:setPosition(hp:getContentSize().width/2,hp:getContentSize().height/2)
-end
---------------------------------------------------------------------------------
--- attack
-function SpriteBoss:attack()
+-- Hp
+function SpriteBoss:addHp()
+    self.label_hp = ccui.TextAtlas:create()
+    self.label_hp:setProperty(self.hp, "labelatlas.png", 17, 22, "0")
+    self.label_hp:setPosition(cc.p(0,-20))
+    self:addChild(self.label_hp)
 end
 --------------------------------------------------------------------------------
 -- hurt
 function SpriteBoss:hurt(damageValue)
     self.hp = self.hp - damageValue
---    self.label_hp:setString(self.hp)
+    self.label_hp:setString(self.hp)
 
     self.action:play("hurt",false)
     if self.hp <= 0 then
@@ -139,7 +156,91 @@ function SpriteBoss:destroy()
     self:removeFromParent()
 end
 
-function SpriteBoss:addDamage(data)
+
+function SpriteBoss:setDebuffOn(data)
+    local type = data.type
+    local count = data.count
+    if type == 1 then
+        self.node:setColor(self.color[type])
+        self.debuff.type = "ATK"
+        self.debuff.value = 100
+    end
+    
+    if type == 5 then
+        self.node:setColor(self.color[type])
+        self.debuff.type = "FREEZE"
+        self.debuff.value = 2
+        local function freezeFor()
+            self:setDebuffOff()
+        end
+        schedule(self, freezeFor, count*self.debuff.value)
+    end
+    
+    --    if type == 2 then
+    --        self.node:setColor(self.color[type])
+    --        self.debuff = 10
+    --    end
+    --
+    --    if type == 3 then
+    --        self.node:setColor(self.color[type])
+    --        self.debuff = 5
+    --    end
+
+end
+
+function SpriteBoss:setDebuffOff()
+    self.node:setColor(self.color[0])
+    self.debuff.value = 1
+end
+
+function SpriteBoss:addAI()
+    local bossSkill = cc.Label:createWithSystemFont("", "HelveticaNeue-Bold", 12)
+    bossSkill:setPosition(cc.p(70,-100))
+    self:addChild(bossSkill)
+    
+    -- 更新时间
+    local function updateTime()
+        self.time = self.time + 1
+        
+        
+        if self.time % 30 == 0 then
+            self.time = 0    
+            self:startAtk()
+        else
+            --模仿魔兽世界插件的倒计时［BOSS发动技能倒计时］
+            if self.debuff.type == "FREEZE" then
+                bossSkill:setString(string.format("Perfect,You have stopped it!"))
+                self.debuff.type = nil
+                self.time = 1  
+            else
+                bossSkill:setString(string.format("Atk will happen in %ss",30 - self.time))
+            end
+            
+        end
+    end
+    schedule(self, updateTime, 1)
+    
+
+--    local a1 = cc.DelayTime:create(20)
+--    local a2 = cc.DelayTime:create(20)
+--    local action1 = cc.Spawn:create(a1,a2)
+--    local action2 = cc.CallFunc:create(start)
+--    self:runAction(cc.RepeatForever:create(cc.Sequence:create(action1, action2)))
+
+end
+
+function SpriteBoss:startAtk()
+    local data = {
+        action = "atk",
+        damage = "10000",
+    }
+    
+    self.action:play(data.action, false)
+    EventDispatchManager:broadcastEventDispatcher(SPRITE_EVENT_ATK,data)
+    print("##########  attack start")
+end
+
+function SpriteBoss:addHurt(data)
     local labelAtlas = ccui.TextAtlas:create()
 
     local count = data.count
@@ -148,32 +249,42 @@ function SpriteBoss:addDamage(data)
     local function actionEnd()
     end
 
+
     local damage = 0
-    if count >= 4 then
-        damage = self.damage[type] * count * 2 -- 4个以上伤害x2
-        local action1 = cc.ScaleTo:create(0.1, 2)
-        local action2 = cc.ScaleTo:create(0.1, 1.5)
-        local action3 = cc.DelayTime:create(1.5)
-        local action4 = cc.FadeOut:create(0.5)
-        local action5 = cc.DelayTime:create(0.5)
-        local action6 = cc.RemoveSelf:create()
-        local action7 = cc.CallFunc:create(actionEnd)
-        labelAtlas:runAction(cc.Sequence:create(action1, action2,action3,action4,action5,action6,action7))
+    --    if count >= 5 then
+    if self.debuff.type == "ATK" then
+        damage = self.damage[type] * count * self.debuff.value
     else
         damage = self.damage[type] * count
-        local action1 = cc.MoveBy:create(2,cc.p(0,80))
-        local action2 = cc.FadeOut:create(2)
-        local action = cc.Spawn:create(action1,action2)
-        local action4 = cc.RemoveSelf:create()
-        labelAtlas:runAction(cc.Sequence:create(action,action4))
     end
+    
+    local action1 = cc.ScaleTo:create(0.1, 2)
+    local action2 = cc.ScaleTo:create(0.1, 1.5)
+    local action3 = cc.DelayTime:create(1.5)
+    local action4 = cc.FadeOut:create(0.5)
+    local action5 = cc.DelayTime:create(0.5)
+    local action6 = cc.RemoveSelf:create()
+    local action7 = cc.CallFunc:create(actionEnd)
+    labelAtlas:runAction(cc.Sequence:create(action1, action2,action3,action4,action5,action6,action7))
+    --    else
+    --        damage = self.damage[type] * count
+    --        local action1 = cc.MoveBy:create(2,cc.p(0,80))
+    --        local action2 = cc.FadeOut:create(2)
+    --        local action = cc.Spawn:create(action1,action2)
+    --        local action4 = cc.RemoveSelf:create()
+    --        labelAtlas:runAction(cc.Sequence:create(action,action4))
+    --    end
 
     labelAtlas:setProperty(damage, "labelatlas.png", 17, 22, "0")
-    labelAtlas:setPosition(self:getContentSize().width/2,self:getContentSize().height)
+    labelAtlas:setPosition(0,-100)
     self:addChild(labelAtlas)
-    
     self:hurt(damage)
+
+    self:setDebuffOff() -- 清除所有Debuff
+    self:setDebuffOn(data) -- 设置新Debuff
 end
+
+
 
 function SpriteBoss:getPosition()
     local pos = {}

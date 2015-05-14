@@ -44,15 +44,15 @@ end
 
 -- 添加背景
 function GameOverScene:addBG()
-    -- 背景图片
-    local bg = cc.Sprite:create("loading.png")
-    bg:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2))
-    self:addChild(bg, -1)
-
-    -- logo
-    local logo = cc.Sprite:create("gameOver.png")
-    logo:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2 + 150))
-    self:addChild(logo, 10)
+--    -- 背景图片
+--    local bg = cc.Sprite:create("loading.png")
+--    bg:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2))
+--    self:addChild(bg, -1)
+--
+--    -- logo
+--    local logo = cc.Sprite:create("gameOver.png")
+--    logo:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2 + 150))
+--    self:addChild(logo, 10)
 end
 
 

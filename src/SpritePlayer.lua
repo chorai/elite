@@ -3,8 +3,7 @@
 -- 【クラス】Player
 -- @date 2014/12/24
 -- @author  Cho Rai
-local SpriteATK = require("SpriteATK")
-SpritePlayer = class("SpritePlayer", function()
+local SpritePlayer = class("SpritePlayer", function()
     return cc.Sprite:create()
 end)
 SpritePlayer.active             = nil
@@ -19,22 +18,12 @@ SpritePlayer.delayTime          = nil
 SpritePlayer.size               = nil
 SpritePlayer.label_hp           = nil
 SpritePlayer.slider_hp          = nil
-
-SpritePlayer.spriteAtk          = nil
-
 SpritePlayer.action     = nil
 --------------------------------------------------------------------------------
 -- ctor
 function SpritePlayer:ctor()
     self.active = true
-    self.canBeAttack = false
-    self.hp = 20
-    self.atk = 10000
-    self.power = 1.0
-    self.speed = 220
-    self.bulleSpeed = 900
-    self.bulletPowerValue = 1
-    self.delayTime = 0.1
+    self.hp = 20000
 end
 --------------------------------------------------------------------------------
 -- create
@@ -43,101 +32,39 @@ function SpritePlayer:create()
     player:init()
     return player
 end
-
-function SpritePlayer:addArmature()
-    local node = cc.CSLoader:createNode("huchey.csb")
-    self.action = cc.CSLoader:createTimeline("huchey.csb")
-    node:runAction(self.action)
-    self.action:play("idel", true)
-    node:setScale(0.5)
-    --    node:setPosition(node:getContentSize().width + 20,0)
-    self:addChild(node)
-
-    local function onFrameEvent(frame)
-        if nil == frame then
-            return
-        end
-        local str = frame:getEvent()
-        if str == "hurted" then
-            self.action:play("idel", true)
-        elseif(str == "atked") then
-
-            self.action:play("idel", true)
-        end
-    end
-    self.action:setFrameEventCallFunc(onFrameEvent)
-
-    local function callBack(event)
-        local data = event._data
-        self:playEvent(data)
-    end
-    --    EventDispatchManager:createEventDispatcher(self,"SELECT_CARD_FROM_FOOTER",callBack)
-    EventDispatchManager:createEventDispatcher(self,"SPRITE_PLAYER_EVENT",callBack)
-end
-
-function SpritePlayer:playEvent(data)
-    --动作
-    self.action:play(data.action, false)
-    --射了 Oh yeah  发射攻击物体
-    self:atking(data.type)
-end
-
---发射攻击物体
-function SpritePlayer:atking(type)
-    if type then
-        print("########## ATKING #######"..type)
---        local data = {}
---        self.spriteAtk = SpriteATK:createSprite(data)
---        self:addChild(self.spriteAtk)
-    end
-end
-
-function SpritePlayer:broadCastEvent(data)
-    EventDispatchManager:broadcastEventDispatcher("SPRITE_PLAYER_EVENT",data)
-end
 --------------------------------------------------------------------------------
 -- init
 function SpritePlayer:init()
-    self:addArmature()
-    local texture = cc.Director:getInstance():getTextureCache():addImage("fireball_1.png")
-    local sp0 = cc.SpriteFrame:createWithTexture(texture, cc.rect(0, 0, 50, 50))
-    self:setSpriteFrame(sp0)
-    self.size = self:getContentSize()
-    self:setPosition(cc.p(50, WIN_SIZE.height/2 + 120))
-
-    -- hp value
-    self.label_hp = cc.Label:createWithBMFont("Font/arial-14.fnt", self.hp)
-    self.label_hp:setSystemFontSize(30)
-    self.label_hp:setColor(cc.c3b(255,255, 255))
-
-    local hp = ccui.ImageView:create()
-    hp:setScale(0.3)
-    hp:setPosition(self.size.width/2 ,self.size.height + 20)
-    hp:loadTexture("status_hp.png")
-    hp:addChild(self.label_hp)
-    self:addChild(hp)
-    self.label_hp:setPosition(hp:getContentSize().width/2,hp:getContentSize().height/2)
-
-    self:setOpacity(0)
-    --    self.action:setCascadeOpacityEnabled(false)
-    hp:setCascadeOpacityEnabled(false)
-
-    --    self:setPhysicsBody(cc.PhysicsBody:createCircle(self:getContentSize().width/2))
-    --    self:getPhysicsBody():setCategoryBitmask(CATEGORY_MASK_PLAYER_A)
-    --    self:getPhysicsBody():setCollisionBitmask(COLLISION_MASK_PLAYER_A)
-    --    self:getPhysicsBody():setContactTestBitmask(CONTACTTEST_MASK_PLAYER_A)
+    self:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2))
+    self:addHp()
+    self:addEventDispatcher()
 end
---------------------------------------------------------------------------------
--- attack
-function SpritePlayer:attack()
+
+function SpritePlayer:addEventDispatcher()
+    print("##########  attack over")
+    local function callBack(event)
+        local data = event._data
+        if data.action == "atk" then
+            self:hurt(data.damage)
+        end
+    end
+    EventDispatchManager:createEventDispatcher(self,"SPRITE_EVENT_ATK",callBack)
 end
+
+function SpritePlayer:addHp()
+    self.label_hp = ccui.TextAtlas:create()
+    self.label_hp:setSize(5)
+    self.label_hp:setProperty(self.hp, "labelatlas.png", 17, 22, "0")
+    self.label_hp:setPosition(cc.p(0,-WIN_SIZE.height/2 + 10))
+    self:addChild(self.label_hp)
+end
+
 --------------------------------------------------------------------------------
 -- hurt
 function SpritePlayer:hurt(damageValue)
     self.hp = self.hp - damageValue
     self.label_hp:setString(self.hp)
 
-    self.action:play("hurt",false)
     if self.hp <= 0 then
         self.active = false
     end
@@ -160,3 +87,4 @@ function SpritePlayer:destroy()
     end
     self:removeFromParent()
 end
+return SpritePlayer
