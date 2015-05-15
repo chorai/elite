@@ -87,8 +87,13 @@ function SpriteBoss:addArmature()
     self.action:play("idel", true)
     self.node:setPosition(0,-180)
 
-    self:addChild(self.node)
+--    self:addChild(self.node)
 
+    local boss = cc.Sprite:create("boss.png")
+    boss:setScale(0.5)
+    boss:setPosition(0,-140)
+    self:addChild(boss)
+    
     local function onFrameEvent(frame)
         if nil == frame then
             return

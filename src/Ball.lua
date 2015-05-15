@@ -11,6 +11,7 @@ Ball._type = 0
 
 Ball.size = 0
 Ball.scalePer = 0.32 -- TODO 这个要弄成可变的！！
+--Ball.scalePer = 0.5 -- TODO 这个要弄成可变的！！
 
 --Ball.type = {
 --    [1] = "donat_1.png",
@@ -20,21 +21,21 @@ Ball.scalePer = 0.32 -- TODO 这个要弄成可变的！！
 --    [5] = "cat_1.png",
 --}
 
---Ball.type = {
---    [1] = "cat_1.png",
---    [2] = "cat_1.png",
---    [3] = "cat_1.png",
---    [4] = "cat_1.png",
---    [5] = "cat_1.png",
---}
-
 Ball.type = {
-    [1] = "mage_1.png", --毒
-    [2] = "mage_2.png", --ATK
-    [3] = "mage_3.png", --DEF
-    [4] = "mage_4.png",
-    [5] = "mage_5.png",--freeze
+    [1] = "cat_1.png",
+    [2] = "cat_1.png",
+    [3] = "cat_1.png",
+    [4] = "cat_1.png",
+    [5] = "cat_1.png",
 }
+
+--Ball.type = {
+--    [1] = "tsum_1.png", --毒
+--    [2] = "tsum_2.png", --ATK
+--    [3] = "tsum_1.png", --DEF
+--    [4] = "tsum_2.png",
+--    [5] = "tsum_2.png",--freeze
+--}
 
 function Ball:ctor()
 end
@@ -50,9 +51,9 @@ function Ball:init(type)
     local _tagColor = {
         [1] = cc.c3b(30,92,9),
         [2] = cc.c3b(2,105,248),
-        [3] = cc.c3b(255,225,255),
+        [3] = cc.c3b(239,225,13),
         [4] = cc.c3b(239,255,180),
-        [5] = cc.c3b(239,225,13),
+        [5] = cc.c3b(255,255,255),
     }
     self:setColor(_tagColor[type])
     
@@ -66,9 +67,7 @@ function Ball:init(type)
 --    end
     self:setScale(self.scalePer)
     self.size = (size.width/2) * self.scalePer
-    local pBall = cc.PhysicsBody:createCircle(((size.width-5)/2) * self.scalePer, cc.PhysicsMaterial(1, 0, 0.4))
-    --    local w = (size.width/2) * self.scalePer
-    --    local pBall = cc.PhysicsBody:createBox(cc.size(w, w),cc.PhysicsMaterial(1, 0.6, 0.3))
+    local pBall = cc.PhysicsBody:createCircle((self.size), cc.PhysicsMaterial(1, 0, 0.4))
     pBall:setDynamic(true)
     pBall:setRotationEnable(true)
     --    pBall:setMoment(PHYSICS_INFINITY) --モーメント(大きいほど回転しにくい)
