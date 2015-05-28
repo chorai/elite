@@ -15,7 +15,6 @@ require("SpriteArmy")
 require("SpriteEnemy")
 
 require("GameLayer")
-require("GameOverScene")
 require("GameScene")
 require("Global")
 require("HelloScene")

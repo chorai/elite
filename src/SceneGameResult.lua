@@ -1,38 +1,44 @@
 
-GameOverScene = class("GameOverScene", function()
+local SceneGameResult = class("SceneGameResult", function()
     return cc.Layer:create()
 end)
 
-
-function GameOverScene:ctor()
+function SceneGameResult:ctor()
 
 end
 
-
-function GameOverScene:create()
-    local layer = GameOverScene.new()
-    layer:init()
+function SceneGameResult:create(isWin)
+    local layer = SceneGameResult.new()
+    layer:init(isWin)
     return layer
 end
 
 
-function GameOverScene:createScene()
+function SceneGameResult:createScene(isWin)
     local scene = cc.Scene:create()
-    local layer = GameOverScene:create()
+    local layer = SceneGameResult:create(isWin)
     scene:addChild(layer)
     return scene
 end
 
 
-function GameOverScene:init()
+function SceneGameResult:init(isWin)
     self:loadingMusic()
     self:addBG()
     self:addBtn()
+    local winOrLost = cc.Label:createWithSystemFont("", "HelveticaNeue-Bold", 30)
+    winOrLost:setPosition(cc.p(WIN_SIZE.width/2,WIN_SIZE.height/2))
+    self:addChild(winOrLost)
+    if isWin then
+        winOrLost:setString("You Win!!!")
+    else
+        winOrLost:setString("You Lost!!!")
+    end
 end
 
 
 -- 背景音乐
-function GameOverScene:loadingMusic()
+function SceneGameResult:loadingMusic()
     if Global:getInstance():getAudioState() == true then
         cc.SimpleAudioEngine:getInstance():stopMusic()
         cc.SimpleAudioEngine:getInstance():playMusic("Music/mainMainMusic.mp3", true)
@@ -43,7 +49,7 @@ end
 
 
 -- 添加背景
-function GameOverScene:addBG()
+function SceneGameResult:addBG()
 --    -- 背景图片
 --    local bg = cc.Sprite:create("loading.png")
 --    bg:setPosition(cc.p(WIN_SIZE.width/2, WIN_SIZE.height/2))
@@ -57,7 +63,7 @@ end
 
 
 -- 添加按钮
-function GameOverScene:addBtn()
+function SceneGameResult:addBtn()
     local function callback(tag, sender)
         if sender:getTag() == 101 then
             self:turnToGameScene()
@@ -91,7 +97,7 @@ end
 
 
 -- 重新游戏
-function GameOverScene:turnToGameScene()
+function SceneGameResult:turnToGameScene()
     local scene = GameScene:createScene()
     local tt = cc.TransitionFade:create(1.0, scene)
     cc.Director:getInstance():replaceScene(tt)
@@ -99,9 +105,11 @@ end
 
 
 -- 返回主界面
-function GameOverScene:turnToLoadingScene()
+function SceneGameResult:turnToLoadingScene()
     local scene = LoadingScene:createScene()
     local tt = cc.TransitionFade:create(1.0, scene)
     cc.Director:getInstance():replaceScene(tt)
 end
+
+return SceneGameResult
     

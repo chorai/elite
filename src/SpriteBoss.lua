@@ -7,6 +7,7 @@ local SpriteBoss = class("SpriteBoss", function()
     return cc.Sprite:create()
 end)
 SpriteBoss.node             = nil
+SpriteBoss.sprite             = nil
 SpriteBoss.active             = nil
 SpriteBoss.canBeAttack        = nil
 SpriteBoss.hp                 = nil
@@ -43,7 +44,7 @@ SpriteBoss.color = {
     [0] = cc.c3b(255,255,255),
     [1] = cc.c3b(30,92,9),
     [2] = cc.c3b(239,225,13),
-    [3] = cc.c3b(239,255,180),
+    [3] = cc.c3b(255,0,0),
     [4] = cc.c3b(2,105,248),
     [5] = cc.c3b(255,255,255),
 }
@@ -87,12 +88,12 @@ function SpriteBoss:addArmature()
     self.action:play("idel", true)
     self.node:setPosition(0,-180)
 
---    self:addChild(self.node)
+    self:addChild(self.node)
 
-    local boss = cc.Sprite:create("boss.png")
-    boss:setScale(0.5)
-    boss:setPosition(0,-140)
-    self:addChild(boss)
+    self.sprite = cc.Sprite:create("boss.png")
+    self.sprite:setScale(0.5)
+    self.sprite:setPosition(0,-140)
+--    self:addChild(self.sprite)
     
     local function onFrameEvent(frame)
         if nil == frame then
@@ -165,37 +166,40 @@ end
 function SpriteBoss:setDebuffOn(data)
     local type = data.type
     local count = data.count
-    if type == 1 then
-        self.node:setColor(self.color[type])
-        self.debuff.type = "ATK"
-        self.debuff.value = 100
-    end
     
-    if type == 5 then
+    --冰冻
+    if type ==  DEBUFF.FREEZE then
+--        self.sprite:setColor(self.color[type])
         self.node:setColor(self.color[type])
-        self.debuff.type = "FREEZE"
+        self.debuff.type = DEBUFF.FREEZE
         self.debuff.value = 2
         local function freezeFor()
-            self:setDebuffOff()
         end
         schedule(self, freezeFor, count*self.debuff.value)
+    elseif type ==  DEBUFF.DEFDOWN then  --减护甲
+--        self.sprite:setColor(self.color[type])
+        self.node:setColor(self.color[type])
+        self.debuff.type = DEBUFF.DEFDOWN
+        self.debuff.value = 100
+    else
+--        self.sprite:setColor(self.color[0])
+        self.node:setColor(self.color[0])
+        self.debuff.type = DEBUFF.ATK
+        self.debuff.value = 1
     end
     
+    
+    
     --    if type == 2 then
-    --        self.node:setColor(self.color[type])
+    --        self.sprite:setColor(self.color[type])
     --        self.debuff = 10
     --    end
     --
     --    if type == 3 then
-    --        self.node:setColor(self.color[type])
+    --        self.sprite:setColor(self.color[type])
     --        self.debuff = 5
     --    end
 
-end
-
-function SpriteBoss:setDebuffOff()
-    self.node:setColor(self.color[0])
-    self.debuff.value = 1
 end
 
 function SpriteBoss:addAI()
@@ -213,7 +217,7 @@ function SpriteBoss:addAI()
             self:startAtk()
         else
             --模仿魔兽世界插件的倒计时［BOSS发动技能倒计时］
-            if self.debuff.type == "FREEZE" then
+            if self.debuff.type == DEBUFF.FREEZE then
                 bossSkill:setString(string.format("Perfect,You have stopped it!"))
                 self.debuff.type = nil
                 self.time = 1  
@@ -257,7 +261,7 @@ function SpriteBoss:addHurt(data)
 
     local damage = 0
     --    if count >= 5 then
-    if self.debuff.type == "ATK" then
+    if self.debuff.type == DEBUFF.DEFDOWN then
         damage = self.damage[type] * count * self.debuff.value
     else
         damage = self.damage[type] * count
@@ -285,7 +289,6 @@ function SpriteBoss:addHurt(data)
     self:addChild(labelAtlas)
     self:hurt(damage)
 
-    self:setDebuffOff() -- 清除所有Debuff
     self:setDebuffOn(data) -- 设置新Debuff
 end
 

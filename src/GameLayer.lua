@@ -1,5 +1,7 @@
 local SpriteCard = require("SpriteCard")
 local GameFooter = require("GameFooter")
+local SceneGameResult = require("SceneGameResult")
+
 require("VisibleRect")
 local Ball = require("Ball")
 local DrawLine = require("DrawLine")
@@ -11,6 +13,8 @@ GameLayer = class("GameLayer", function()
 end)
 GameLayer.stateGamePlaying = 0
 GameLayer.stateGameOver = 1
+GameLayer.resultWin = 1
+GameLayer.resultLost = 0
 
 GameLayer.gameState = nil
 GameLayer.gameTime = nil                --
@@ -105,12 +109,12 @@ function GameLayer:addPuzzle()
     --    local edge = cc.PhysicsBody:createEdgeChain(vec,6,cc.PhysicsMaterial(0.0,0.0,0.5))
     local edge = cc.PhysicsBody:createEdgeBox(cc.size(winSize.width + 40,winSize.height),cc.PhysicsMaterial(0,0,0.5),20)
     self.wall:setPhysicsBody(edge)
---    wall:setPosition(VisibleRect:bottom())
+    --    wall:setPosition(VisibleRect:bottom())
     self.wall:setPosition(cc.p(WIN_SIZE.width/2,WIN_SIZE.height/2))
     self:addChild(self.wall)
 end
 
-function GameLayer:showBullet()
+function GameLayer:addBalls()
     local addNum = MAX_BULLET - _bullet
     local typeId = math.random(1,5)
     local ball = Ball:create(typeId)
@@ -142,8 +146,8 @@ function GameLayer:addBG()
     --    self.bg2 = cc.Sprite:create("bg_01.jpg")
     --    self.bg2:setAnchorPoint(cc.p(0, 0))
     self.bg1:setPosition(0, offside)
---    self.bg1:setScale(0.5)
---    self.bg2:setPosition(0, self.bg1:getContentSize().height)
+    --    self.bg1:setScale(0.5)
+    --    self.bg2:setPosition(0, self.bg1:getContentSize().height)
     self:addChild(self.bg1, -10)
     --    self:addChild(self.bg2, -10)
 end
@@ -255,12 +259,17 @@ function GameLayer:addTouch()
                 local p1 = _bullets[#_bullets]:getPosition()
                 local p2 = bullet:getPosition()
                 local distance = cc.pGetDistance(p1,p2)
-                print("####### distance"..distance)
-                print("####### bullet.size"..bullet.size)
                 if distance < bullet.size * 3 then
                     print("####### touchIdx"..touchIdx)
                     touchIdx = touchIdx + 1
                     _bullets[touchIdx] = bullet
+                end
+            else
+                local obj1 = _bullets[#_bullets]
+                local obj2 = _bullets[#_bullets-1]
+                if bullet == obj2 then
+                    touchIdx = touchIdx - 1
+                    table.remove(_bullets,#_bullets)
                 end
             end
         end
@@ -336,7 +345,7 @@ end
 function GameLayer:update(dt)
     _time = _time + 1
     if MAX_BULLET >= _bullet then
-        self:showBullet()
+        self:addBalls()
     end
 
 
@@ -359,8 +368,8 @@ end
 -- 更新游戏
 function GameLayer:updateGame()
     if self.gameState == self.stateGamePlaying then
-        self:checkGameOver()        -- 战机重生,或游戏结束
-        self:updateUI()             -- 刷新界面
+        self:checkGameOver()
+        self:updateUI()
     end
 end
 
@@ -372,11 +381,11 @@ function GameLayer:checkGameOver()
     if  self.boss:isActive() == false then
         self.gameState = self.stateGameOver
         --You Win
-        self:gameOver()
+        self:gameResult(true)
     elseif self.player:isActive() == false then
         self.gameState = self.stateGameOver
-        --You Win
-        self:gameOver()
+        --You Lost
+        self:gameResult(false)
     end
 end
 
@@ -404,9 +413,9 @@ end
 
 
 -- 游戏结束
-function GameLayer:gameOver()
+function GameLayer:gameResult(isWin)
     Global:getInstance():ExitGame()
-    local scene = GameOverScene:createScene()
+    local scene = SceneGameResult:createScene(isWin)
     local tt = cc.TransitionCrossFade:create(1.0, scene)
     cc.Director:getInstance():replaceScene(tt)
 end
@@ -423,9 +432,9 @@ function GameLayer:addAtkEffect(from,to)
     local emitter = cc.ParticleSystemQuad:create("particle_atk2.plist")
     self:addChild(emitter,1111111)
     emitter:setPosition(from)
-    local action1 = cc.MoveTo:create(0.3,to)
+    local action1 = cc.MoveTo:create(1,to)
     local action2 = cc.RemoveSelf:create()
-    emitter:runAction(cc.Sequence:create(action1, action2))  
+    emitter:runAction(cc.Sequence:create(action1, action2))
 end
 
 function GameLayer:DrawLineRemove()

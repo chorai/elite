@@ -22,20 +22,12 @@ Ball.scalePer = 0.32 -- TODO 这个要弄成可变的！！
 --}
 
 Ball.type = {
-    [1] = "cat_1.png",
-    [2] = "cat_1.png",
-    [3] = "cat_1.png",
-    [4] = "cat_1.png",
-    [5] = "cat_1.png",
+    [1] = "cat_1.png",  
+    [2] = "cat_1.png",      
+    [3] = "cat_1.png",      --DEFDOWN
+    [4] = "cat_1.png",  --FREEZE
+    [5] = "cat_1.png", 
 }
-
---Ball.type = {
---    [1] = "tsum_1.png", --毒
---    [2] = "tsum_2.png", --ATK
---    [3] = "tsum_1.png", --DEF
---    [4] = "tsum_2.png",
---    [5] = "tsum_2.png",--freeze
---}
 
 function Ball:ctor()
 end
@@ -49,10 +41,10 @@ end
 function Ball:init(type)
   
     local _tagColor = {
-        [1] = cc.c3b(30,92,9),
-        [2] = cc.c3b(2,105,248),
-        [3] = cc.c3b(239,225,13),
-        [4] = cc.c3b(239,255,180),
+        [1] = cc.c3b(152,255,50),
+        [2] = cc.c3b(92,78,29),
+        [3] = cc.c3b(245,100,0),
+        [4] = cc.c3b(10,126,254),
         [5] = cc.c3b(255,255,255),
     }
     self:setColor(_tagColor[type])
