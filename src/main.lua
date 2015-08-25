@@ -28,7 +28,7 @@ local function main()
     collectgarbage("setstepmul", 5000)
 
     -- 屏幕适配
-    cc.Director:getInstance():getOpenGLView():setDesignResolutionSize(320, 480, cc.ResolutionPolicy.FIXED_WIDTH) 
+    cc.Director:getInstance():getOpenGLView():setDesignResolutionSize(320, 480, cc.ResolutionPolicy.FIXED_WIDTH)
 
     -- 帧率信息
     cc.Director:getInstance():setAnimationInterval(1.0 / 60)

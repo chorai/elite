@@ -10,7 +10,8 @@ Ball._state = 0
 Ball._type = 0
 
 Ball.size = 0
-Ball.scalePer = 0.32 -- TODO 这个要弄成可变的！！
+Ball.scalePer = 0.35          -- TODO 这个要弄成可变的！！
+Ball.circleSize = 22
 --Ball.scalePer = 0.5 -- TODO 这个要弄成可变的！！
 
 --Ball.type = {
@@ -22,11 +23,11 @@ Ball.scalePer = 0.32 -- TODO 这个要弄成可变的！！
 --}
 
 Ball.type = {
-    [1] = "cat_1.png",  
-    [2] = "cat_1.png",      
-    [3] = "cat_1.png",      --DEFDOWN
-    [4] = "cat_1.png",  --FREEZE
-    [5] = "cat_1.png", 
+    [1] = "ball_adore.png",  
+    [2] = "ball_hell.png",      
+    [3] = "ball_boom.png",      --DEFDOWN
+    [4] = "ball_cold.png",  --FREEZE
+    [5] = "ball_boss.png", 
 }
 
 function Ball:ctor()
@@ -47,7 +48,7 @@ function Ball:init(type)
         [4] = cc.c3b(10,126,254),
         [5] = cc.c3b(255,255,255),
     }
-    self:setColor(_tagColor[type])
+--    self:setColor(_tagColor[type])
     
     self._type = type
     self:setTexture(cc.Director:getInstance():getTextureCache():addImage(self.type[type]))
@@ -59,7 +60,7 @@ function Ball:init(type)
 --    end
     self:setScale(self.scalePer)
     self.size = (size.width/2) * self.scalePer
-    local pBall = cc.PhysicsBody:createCircle((self.size), cc.PhysicsMaterial(1, 0, 0.4))
+    local pBall = cc.PhysicsBody:createCircle((self.circleSize), cc.PhysicsMaterial(1, 0, 0.4))
     pBall:setDynamic(true)
     pBall:setRotationEnable(true)
     --    pBall:setMoment(PHYSICS_INFINITY) --モーメント(大きいほど回転しにくい)

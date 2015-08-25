@@ -32,7 +32,7 @@ GameLayer.name = nil
 local winSize = nil
 local offside = nil
 
-local MAX_BULLET = 50
+local MAX_BULLET = 40
 local _bullet = 0
 local _time = 0
 local _tag = nil
@@ -142,13 +142,13 @@ end
 
 -- 添加背景
 function GameLayer:addBG()
-    self.bg1 = cc.Sprite:create("bg.jpg")
+    self.bg1 = cc.Sprite:create("bg.png")
     --    self.bg2 = cc.Sprite:create("bg_01.jpg")
-    --    self.bg2:setAnchorPoint(cc.p(0, 0))
-    self.bg1:setPosition(0, offside)
-    --    self.bg1:setScale(0.5)
+    self.bg1:setAnchorPoint(cc.p(0, 0))
+--    self.bg1:setPosition(0, offside)
+--    self.bg1:setScale(0.5)
     --    self.bg2:setPosition(0, self.bg1:getContentSize().height)
-    self:addChild(self.bg1, -10)
+--    self:addChild(self.bg1, 1)
     --    self:addChild(self.bg2, -10)
 end
 
@@ -259,7 +259,7 @@ function GameLayer:addTouch()
                 local p1 = _bullets[#_bullets]:getPosition()
                 local p2 = bullet:getPosition()
                 local distance = cc.pGetDistance(p1,p2)
-                if distance < bullet.size * 3 then
+                if distance < bullet.size * 4 then
                     print("####### touchIdx"..touchIdx)
                     touchIdx = touchIdx + 1
                     _bullets[touchIdx] = bullet
